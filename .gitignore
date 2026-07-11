@@ -1,0 +1,9 @@
+Debug
+Release
+BareNucleo-Debug
+.settings/
+mx.scratch
+*.launch
+__pycache__
+*.pyc
+*.elf
