@@ -1,4 +1,5 @@
 #include "../../encoder/usbh/usb_fs_setup.h"
+#include "../../encoder/encoder/impulse-encoder.h"
 
 #include "main.h"
 
@@ -45,7 +46,6 @@ static void process_data_out_request(const uint8_t * income) {
 
 static bool gs_FlashLightOn = true;
 static bool gs_BlackoutOn = false;
-static uint16_t gs_Rotation = 0x00;
 static bool gs_Zerobit = true;
 
 static uint32_t gs_PreviosCall = 0;
@@ -66,8 +66,9 @@ static void compose_status(void) {
 	gUiHidReport[StatusBytePosition] = (gs_FlashLightOn ? FlashLightBit : 0x00) |
 					  (gs_Zerobit ? ZeroPosBit : 0x00) |
 					  (gs_BlackoutOn   ? BlackoutBit : 0x00);
-	gUiHidReport[2] =  (gs_Rotation >> 8) & 0xFFu;
-	gUiHidReport[3] =  (gs_Rotation) & 0xFFu;
+	const uint16_t rotation = impulse_encoder_get_pos();
+	gUiHidReport[2] =  (rotation >> 8) & 0xFFu;
+	gUiHidReport[3] =  (rotation) & 0xFFu;
 }
 
 
@@ -93,26 +94,26 @@ static bool report_timeout(void) {
 }
 
 
-void fake_process_lens_simulation() {
-	return;
-	uint32_t currentTick = HAL_GetTick();
-	if ( gs_StartTick == 0 || gs_StartTick > currentTick ) {
-		gs_StartTick = currentTick;
-	}
-	uint32_t ticks = ((currentTick - gs_StartTick)) % (MaxTickCount);
-	gs_Rotation = (uint16_t)( (1.0 + sin( (double)ticks / MaxTickCount * 3.1415)) / 2 * MaxTickCount );
-}
+//void fake_process_lens_simulation() {
+//	return;
+//	uint32_t currentTick = HAL_GetTick();
+//	if ( gs_StartTick == 0 || gs_StartTick > currentTick ) {
+//		gs_StartTick = currentTick;
+//	}
+//	uint32_t ticks = ((currentTick - gs_StartTick)) % (MaxTickCount);
+//	gs_Rotation = (uint16_t)( (1.0 + sin( (double)ticks / MaxTickCount * 3.1415)) / 2 * MaxTickCount );
+//}
 
 
-void lens_simul_set_rotation(unsigned rotation, bool zeroBit) {
-	if ( rotation > 0 ) {
-		gs_Zerobit = false;
-	}
-	if ( rotation == 0 && zeroBit ) {
-		gs_Zerobit = true;
-	}
-	gs_Rotation = rotation;
-}
+//void lens_simul_set_rotation(unsigned rotation, bool zeroBit) {
+//	if ( rotation > 0 ) {
+//		gs_Zerobit = false;
+//	}
+//	if ( rotation == 0 && zeroBit ) {
+//		gs_Zerobit = true;
+//	}
+//	gs_Rotation = rotation;
+//}
 
 
 static void process_request(uint8_t * input, uint16_t size) {
@@ -122,7 +123,7 @@ static void process_request(uint8_t * input, uint16_t size) {
 		gs_BlackoutOn   = (input[StatusBytePosition] & BlackoutBit)   == BlackoutBit;
 		if ( (input[StatusBytePosition] & ZeroPosBit) == ZeroPosBit ) {
 			gs_StartTick = 0;
-			gs_Rotation  = 0;
+			impulse_encoder_zero();
 			gs_Zerobit = true;
 		}
 	}

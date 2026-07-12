@@ -127,7 +127,6 @@ int main(void)
   while (1)
   {
 	  impulse_encoder_update(& PULSE_ENCODER_EC11_TIMER);
-//	  fake_process_lens_simulation();
 	  myhid_process_request();
     /* USER CODE END WHILE */
 

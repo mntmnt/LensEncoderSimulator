@@ -13,4 +13,3 @@ typedef int HidReportTypeCode;
 
 void myhid_data_arrived(const uint8_t *, HidReportTypeCode);
 void myhid_process_request(void);
-void fake_process_lens_simulation(void);
