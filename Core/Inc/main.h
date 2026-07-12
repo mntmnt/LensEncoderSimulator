@@ -69,6 +69,7 @@ void Error_Handler(void);
 #  define ENCODER_SHARED_MINOR_VERSION   ENCODER_MINOR_VERSION
 #endif
 
+#define PULSE_ENCODER_EC11_TIMER htim3
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
