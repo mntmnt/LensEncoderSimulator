@@ -277,6 +277,12 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef * htim) {
+	if ( htim == (&PULSE_ENCODER_EC11_TIMER) ) {
+		impulse_encoder_tick(htim);
+	}
+}
+
 /* USER CODE END 4 */
 
 /**
