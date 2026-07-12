@@ -46,10 +46,13 @@ void impulse_encoder_tick(TIM_HandleTypeDef * htim) {
 
 
 void impulse_encoder_setup(TIM_HandleTypeDef * htim) {
-	assert_param( gs_encoderTimer != htim );
+    assert_param( htim != NULL );
+    assert_param( gs_encoderTimer != htim );
 
-	gs_encoderTimer = htim;
-	HAL_TIM_Encoder_Start_IT(gs_encoderTimer, TIM_CHANNEL_ALL);
+    gs_encoderTimer = htim;
+    if ( HAL_TIM_Encoder_Start_IT(gs_encoderTimer, TIM_CHANNEL_ALL) != HAL_OK ) {
+        Error_Handler();
+    }
 }
 
 
